@@ -1,0 +1,91 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold"><i class="bi bi-clipboard-data"></i> Production Entries</h2>
+  <a href="/production/add" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Entry</a>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="GET" action="/production" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label for="date" class="form-label small">Date</label>
+        <input type="date" class="form-control" id="date" name="date" value="<%= today %>">
+      </div>
+      <div class="col-md-3">
+        <label for="shift_id" class="form-label small">Shift</label>
+        <select class="form-select" id="shift_id" name="shift_id">
+          <option value="">All Shifts</option>
+          <% shifts.forEach(function(shift) { %>
+          <option value="<%= shift.id %>" <%= String(shift.id) === selectedShift ? 'selected' : '' %>><%= shift.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="machine_id" class="form-label small">Machine</label>
+        <select class="form-select" id="machine_id" name="machine_id">
+          <option value="">All Machines</option>
+          <% machines.forEach(function(machine) { %>
+          <option value="<%= machine.id %>" <%= String(machine.id) === selectedMachine ? 'selected' : '' %>><%= machine.machine_name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Entries Table -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Shift</th>
+            <th>Machine</th>
+            <th class="text-end">Meters</th>
+            <th class="text-end">Defects</th>
+            <th class="text-end">Defect %</th>
+            <th>Remarks</th>
+            <th>Entered By</th>
+            <% if (user.role === 'admin' || user.role === 'supervisor') { %>
+            <th>Action</th>
+            <% } %>
+          </tr>
+        </thead>
+        <tbody>
+          <% entries.forEach(function(entry) { %>
+          <tr>
+            <td><%= entry.date %></td>
+            <td><span class="badge bg-info"><%= entry.shift_name %></span></td>
+            <td><%= entry.machine_name %></td>
+            <td class="text-end"><%= Number(entry.meters_produced).toLocaleString() %></td>
+            <td class="text-end"><%= Number(entry.defect_meters).toLocaleString() %></td>
+            <td class="text-end">
+              <% const pct = entry.meters_produced > 0 ? ((entry.defect_meters / entry.meters_produced) * 100).toFixed(1) : 0; %>
+              <span class="<%= pct > 5 ? 'text-danger' : 'text-success' %>"><%= pct %>%</span>
+            </td>
+            <td><%= entry.remarks || '-' %></td>
+            <td><small class="text-muted"><%= entry.entered_by_name %></small></td>
+            <% if (user.role === 'admin' || user.role === 'supervisor') { %>
+            <td>
+              <form action="/production/delete/<%= entry.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Delete this entry?')">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+            <% } %>
+          </tr>
+          <% }); %>
+          <% if (entries.length === 0) { %>
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">No production entries found for the selected filters.</td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

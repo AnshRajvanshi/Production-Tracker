@@ -1,0 +1,62 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="fw-bold mb-4"><i class="bi bi-plus-circle"></i> New Production Entry</h4>
+
+        <% if (error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+
+        <form action="/production/add" method="POST">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date</label>
+              <input type="date" class="form-control" id="date" name="date" value="<%= today %>" required>
+            </div>
+            <div class="col-md-4">
+              <label for="shift_id" class="form-label">Shift</label>
+              <select class="form-select" id="shift_id" name="shift_id" required>
+                <option value="">Select Shift</option>
+                <% shifts.forEach(function(shift) { %>
+                <option value="<%= shift.id %>"><%= shift.name %> (<%= shift.start_time %> - <%= shift.end_time %>)</option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="machine_id" class="form-label">Machine</label>
+              <select class="form-select" id="machine_id" name="machine_id" required>
+                <option value="">Select Machine</option>
+                <% machines.forEach(function(machine) { %>
+                <option value="<%= machine.id %>"><%= machine.machine_name %> (<%= machine.machine_number %>)</option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="meters_produced" class="form-label">Meters Produced</label>
+              <input type="number" class="form-control" id="meters_produced" name="meters_produced" 
+                     min="0" step="0.1" required placeholder="e.g., 500" autofocus>
+            </div>
+            <div class="col-md-4">
+              <label for="defect_meters" class="form-label">Defect Meters</label>
+              <input type="number" class="form-control" id="defect_meters" name="defect_meters" 
+                     min="0" step="0.1" value="0" placeholder="e.g., 5">
+            </div>
+            <div class="col-md-4">
+              <label for="remarks" class="form-label">Remarks</label>
+              <input type="text" class="form-control" id="remarks" name="remarks" 
+                     placeholder="Optional notes">
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex justify-content-between">
+            <a href="/production" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> View All</a>
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+              <i class="bi bi-save"></i> Save Entry
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

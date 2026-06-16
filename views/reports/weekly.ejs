@@ -1,0 +1,121 @@
+<div class="mb-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2 class="fw-bold"><i class="bi bi-calendar-week"></i> Weekly Report</h2>
+    <div>
+      <a href="/reports/weekly/export?start_date=<%= sdStr %>" class="btn btn-success btn-sm"><i class="bi bi-download"></i> Download Excel</a>
+      <a href="/reports" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> All Reports</a>
+    </div>
+  </div>
+</div>
+
+<!-- Date Selector -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="GET" action="/reports/weekly" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label for="start_date" class="form-label">Week Starting</label>
+        <input type="date" class="form-control" id="start_date" name="start_date" value="<%= sdStr %>">
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> View Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Total Production</h6>
+        <h3 class="fw-bold"><%= Number(totalMeters).toLocaleString() %> m</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-danger bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Total Defects</h6>
+        <h3 class="fw-bold"><%= Number(totalDefects).toLocaleString() %> m</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-warning bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Defect %</h6>
+        <h3 class="fw-bold"><%= defectPct %>%</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Daily Summary -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <h5 class="fw-bold mb-3">Daily Summary (<%= sdStr %> to <%= edStr %>)</h5>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th class="text-end">Meters Produced</th>
+            <th class="text-end">Defect Meters</th>
+            <th class="text-end">Defect %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% dailySummary.forEach(function(day) { %>
+          <tr>
+            <td><%= day.date %></td>
+            <td class="text-end"><%= Number(day.total_meters).toLocaleString() %></td>
+            <td class="text-end"><%= Number(day.total_defects).toLocaleString() %></td>
+            <td class="text-end">
+              <% const pct = day.total_meters > 0 ? ((day.total_defects / day.total_meters) * 100).toFixed(1) : 0; %>
+              <%= pct %>%
+            </td>
+          </tr>
+          <% }); %>
+          <% if (dailySummary.length === 0) { %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No data for this week.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Table -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <h5 class="fw-bold mb-3">Detailed Entries</h5>
+    <div class="table-responsive">
+      <table class="table table-hover table-sm">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Shift</th>
+            <th>Machine</th>
+            <th class="text-end">Meters</th>
+            <th class="text-end">Defects</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% entries.forEach(function(entry) { %>
+          <tr>
+            <td><%= entry.date %></td>
+            <td><span class="badge bg-info"><%= entry.shift_name %></span></td>
+            <td><%= entry.machine_name %></td>
+            <td class="text-end"><%= Number(entry.meters_produced).toLocaleString() %></td>
+            <td class="text-end"><%= Number(entry.defect_meters).toLocaleString() %></td>
+          </tr>
+          <% }); %>
+          <% if (entries.length === 0) { %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No data for this week.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

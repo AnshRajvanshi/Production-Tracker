@@ -1,0 +1,57 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold"><i class="bi bi-display"></i> Machines</h2>
+  <% if (user.role === 'admin') { %>
+  <a href="/machines/add" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Machine</a>
+  <% } %>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Machine Number</th>
+            <th>Machine Name</th>
+            <th>Status</th>
+            <% if (user.role === 'admin') { %>
+            <th>Actions</th>
+            <% } %>
+          </tr>
+        </thead>
+        <tbody>
+          <% machines.forEach(function(machine) { %>
+          <tr>
+            <td><code><%= machine.machine_number %></code></td>
+            <td><strong><%= machine.machine_name %></strong></td>
+            <td>
+              <% if (machine.status === 'running') { %>
+              <span class="badge bg-success"><i class="bi bi-play-fill"></i> Running</span>
+              <% } else if (machine.status === 'idle') { %>
+              <span class="badge bg-warning text-dark"><i class="bi bi-pause-fill"></i> Idle</span>
+              <% } else if (machine.status === 'maintenance') { %>
+              <span class="badge bg-info"><i class="bi bi-tools"></i> Maintenance</span>
+              <% } else if (machine.status === 'breakdown') { %>
+              <span class="badge bg-danger"><i class="bi bi-exclamation-triangle-fill"></i> Breakdown</span>
+              <% } %>
+            </td>
+            <% if (user.role === 'admin') { %>
+            <td>
+              <a href="/machines/edit/<%= machine.id %>" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+              <form action="/machines/delete/<%= machine.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Delete this machine? This will also delete all related production entries.')">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+            <% } %>
+          </tr>
+          <% }); %>
+          <% if (machines.length === 0) { %>
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">No machines found. <a href="/machines/add">Add your first machine</a>.</td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

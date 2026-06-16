@@ -1,0 +1,110 @@
+<div class="mb-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2 class="fw-bold"><i class="bi bi-gear"></i> Machine-wise Report</h2>
+    <div>
+      <% if (selectedMachine) { %>
+      <a href="/reports/machine-wise/export?machine_id=<%= selectedMachine %>&start_date=<%= startDate %>&end_date=<%= endDate %>" class="btn btn-success btn-sm"><i class="bi bi-download"></i> Download Excel</a>
+      <% } %>
+      <a href="/reports" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> All Reports</a>
+    </div>
+  </div>
+</div>
+
+<!-- Selector -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="GET" action="/reports/machine-wise" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label for="machine_id" class="form-label">Machine</label>
+        <select class="form-select" id="machine_id" name="machine_id" required>
+          <option value="">Select Machine</option>
+          <% machines.forEach(function(machine) { %>
+          <option value="<%= machine.id %>" <%= String(machine.id) === selectedMachine ? 'selected' : '' %>>
+            <%= machine.machine_name %> (<%= machine.machine_number %>)
+          </option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="start_date" class="form-label">From Date</label>
+        <input type="date" class="form-control" id="start_date" name="start_date" value="<%= startDate %>">
+      </div>
+      <div class="col-md-3">
+        <label for="end_date" class="form-label">To Date</label>
+        <input type="date" class="form-control" id="end_date" name="end_date" value="<%= endDate %>">
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> View Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% if (selectedMachine) { %>
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Total Production</h6>
+        <h3 class="fw-bold"><%= Number(summary.total_meters).toLocaleString() %> m</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-danger bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Total Defects</h6>
+        <h3 class="fw-bold"><%= Number(summary.total_defects).toLocaleString() %> m</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-warning bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Defect %</h6>
+        <h3 class="fw-bold"><%= defectPct %>%</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Table -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <h5 class="fw-bold mb-3">Production Entries (<%= startDate %> to <%= endDate %>)</h5>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Shift</th>
+            <th class="text-end">Meters Produced</th>
+            <th class="text-end">Defect Meters</th>
+            <th class="text-end">Defect %</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% entries.forEach(function(entry) { %>
+          <tr>
+            <td><%= entry.date %></td>
+            <td><span class="badge bg-info"><%= entry.shift_name %></span></td>
+            <td class="text-end"><%= Number(entry.meters_produced).toLocaleString() %></td>
+            <td class="text-end"><%= Number(entry.defect_meters).toLocaleString() %></td>
+            <td class="text-end">
+              <% const pct = entry.meters_produced > 0 ? ((entry.defect_meters / entry.meters_produced) * 100).toFixed(1) : 0; %>
+              <%= pct %>%
+            </td>
+            <td><%= entry.remarks || '-' %></td>
+          </tr>
+          <% }); %>
+          <% if (entries.length === 0) { %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No data for this machine in the selected date range.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% } %>

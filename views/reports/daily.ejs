@@ -1,0 +1,93 @@
+<div class="mb-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2 class="fw-bold"><i class="bi bi-calendar-day"></i> Daily Report</h2>
+    <div>
+      <a href="/reports/daily/export?date=<%= reportDate %>" class="btn btn-success btn-sm"><i class="bi bi-download"></i> Download Excel</a>
+      <a href="/reports" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> All Reports</a>
+    </div>
+  </div>
+</div>
+
+<!-- Date Selector -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="GET" action="/reports/daily" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label for="date" class="form-label">Select Date</label>
+        <input type="date" class="form-control" id="date" name="date" value="<%= reportDate %>">
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> View Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Total Production</h6>
+        <h3 class="fw-bold"><%= Number(summary.total_meters).toLocaleString() %> m</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-danger bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Total Defects</h6>
+        <h3 class="fw-bold"><%= Number(summary.total_defects).toLocaleString() %> m</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm bg-warning bg-opacity-10">
+      <div class="card-body text-center">
+        <h6 class="text-muted">Defect %</h6>
+        <h3 class="fw-bold"><%= defectPct %>%</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Table -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <h5 class="fw-bold mb-3">Production Details for <%= reportDate %></h5>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Shift</th>
+            <th>Machine</th>
+            <th class="text-end">Meters Produced</th>
+            <th class="text-end">Defect Meters</th>
+            <th class="text-end">Defect %</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% entries.forEach(function(entry) { %>
+          <tr>
+            <td><span class="badge bg-info"><%= entry.shift_name %></span></td>
+            <td><%= entry.machine_name %> (<%= entry.machine_number %>)</td>
+            <td class="text-end"><%= Number(entry.meters_produced).toLocaleString() %></td>
+            <td class="text-end"><%= Number(entry.defect_meters).toLocaleString() %></td>
+            <td class="text-end">
+              <% const pct = entry.meters_produced > 0 ? ((entry.defect_meters / entry.meters_produced) * 100).toFixed(1) : 0; %>
+              <%= pct %>%
+            </td>
+            <td><%= entry.remarks || '-' %></td>
+          </tr>
+          <% }); %>
+          <% if (entries.length === 0) { %>
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No production data for this date.</td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
