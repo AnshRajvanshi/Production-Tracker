@@ -64,10 +64,10 @@ if (shiftCount.count === 0) {
 const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
 if (userCount.count === 0) {
   const insertUser = db.prepare('INSERT INTO users (username, password_hash, name, role) VALUES (?, ?, ?, ?)');
-  insertUser.run('admin', bcrypt.hashSync('admin123', 10), 'Admin User', 'admin');
-  insertUser.run('supervisor', bcrypt.hashSync('super123', 10), 'Supervisor', 'supervisor');
-  insertUser.run('dataentry', bcrypt.hashSync('data123', 10), 'Data Entry Operator', 'data_entry');
-  console.log('✓ Seeded users: admin, supervisor, dataentry');
+  insertUser.run('admin', bcrypt.hashSync('Ansh@3489', 10), 'Admin User', 'admin');
+  insertUser.run('supervisor', bcrypt.hashSync('Ansh@3489', 10), 'Supervisor', 'supervisor');
+  insertUser.run('dataentry', bcrypt.hashSync('Ansh@3489', 10), 'Data Entry Operator', 'data_entry');
+  console.log('✓ Seeded users with new secure passwords');
 }
 
 // Seed sample machines

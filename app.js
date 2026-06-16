@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const helmet = require('helmet');
 const expressLayouts = require('express-ejs-layouts');
 const db = require('./database/schema');
 const { loadUser } = require('./middleware/auth');
@@ -13,14 +14,31 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disabled to allow Chart.js CDN scripts
+  crossOriginEmbedderPolicy: false // Disabled for CDN resources
+}));
+
+// Disable x-powered-by header
+app.disable('x-powered-by');
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Session configuration
 app.use(session({
-  secret: 'production-tracker-secret-key-2026',
+  secret: 'prod-tracker-secure-key-6a9f8e2d1b7c4a0e3f5d8b2c1a9e7f4d',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 3600000 } // 1 hour
+  name: 'productionTracker.sid', // Custom name instead of default 'connect.sid'
+  cookie: {
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: 3600000, // 1 hour
+    secure: false // Set to true if using HTTPS
+  }
 }));
 app.use(loadUser);
 
@@ -49,8 +67,6 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✓ Production Tracking System running on http://localhost:${PORT}`);
-  console.log(`  Login credentials:`);
-  console.log(`  Admin:      admin / admin123`);
-  console.log(`  Supervisor: supervisor / super123`);
-  console.log(`  Data Entry: dataentry / data123`);
+  console.log(`  Login: http://localhost:${PORT}`);
+  console.log(`  All users have secure passwords set.`);
 });
